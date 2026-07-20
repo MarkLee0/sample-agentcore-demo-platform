@@ -96,11 +96,12 @@ if [ "$SKIP_CDK" = false ]; then
 
   npm install
 
-  CDK_ARGS="-c stackName=$STACK_NAME -c enableCdn=true"
+  CDK_ARGS="-c stackName=$STACK_NAME"
   CDK_PARAMS="--parameters KeyPairName=$(basename "$SSH_KEY" .pem)"
 
   if [ -n "$DOMAIN_NAME" ] && [ -n "$HOSTED_ZONE_ID" ]; then
-    CDK_ARGS="$CDK_ARGS -c domainName=$DOMAIN_NAME -c hostedZoneId=$HOSTED_ZONE_ID"
+    # 仅在提供域名时启用 CDN（stack 要求 enableCdn 必须搭配 domainName/hostedZoneId）
+    CDK_ARGS="$CDK_ARGS -c enableCdn=true -c domainName=$DOMAIN_NAME -c hostedZoneId=$HOSTED_ZONE_ID"
   fi
 
   echo "  Running: npx cdk deploy $CDK_ARGS $CDK_PARAMS --region $REGION --require-approval never"
